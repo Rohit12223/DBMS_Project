@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Restaurant Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="layout-shell">
+        <aside class="sidebar">
+            <div>
+                <p class="eyebrow">Restaurant Hub</p>
+                <h1>RMS</h1>
+                <p class="sidebar-copy">Manage menu, orders, tables, stock, billing, and customer history from one place.</p>
+            </div>
+            <nav class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('menu_management') }}">Menu</a>
+                <a href="{{ url_for('order_management') }}">Orders</a>
+                {% if session.get('role') in ['Admin', 'Staff'] %}
+                <a href="{{ url_for('customer_management') }}">Customers</a>
+                {% endif %}
+                {% if session.get('role') == 'Admin' %}
+                <a href="{{ url_for('employee_management') }}">Employees</a>
+                {% endif %}
+                <a href="{{ url_for('reservations') }}">Reservations</a>
+                {% if session.get('role') in ['Admin', 'Staff'] %}
+                <a href="{{ url_for('inventory') }}">Inventory</a>
+                <a href="{{ url_for('billing') }}">Billing</a>
+                <a href="{{ url_for('analytics') }}">Analytics</a>
+                {% endif %}
+            </nav>
+            <div class="user-badge">
+                <strong>{{ session.get('display_name', 'Guest') }}</strong>
+                <span>{{ session.get('role', 'Visitor') }}</span>
+                <a class="button secondary" href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Restaurant Management System</p>
+                    <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+                </div>
+                <div class="status-pill">Live operations</div>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-stack">
+                        {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

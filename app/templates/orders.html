@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Order Management | RMS{% endblock %}
+{% block page_title %}Order Management{% endblock %}
+{% block content %}
+<section class="content-grid two-column">
+    <div class="panel">
+        <div class="panel-head"><h3>Create Order</h3></div>
+        <form method="post" class="form-grid">
+            {% if session.get('role') == 'Customer' %}
+            <input type="hidden" name="customer_id" value="{{ session.get('customer_id') }}">
+            <div class="full-span tag">Order will be placed for {{ session.get('display_name') }}</div>
+            {% else %}
+            <label>
+                Existing Customer
+                <select name="customer_id">
+                    <option value="">New / walk-in customer</option>
+                    {% for customer in customers %}
+                    <option value="{{ customer.customer_id }}">{{ customer.name }} - {{ customer.phone }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                New Customer Name
+                <input type="text" name="new_customer_name" placeholder="Enter if customer is new">
+            </label>
+            <label>
+                New Customer Phone
+                <input type="text" name="new_customer_phone" placeholder="Required for new customer">
+            </label>
+            <label>
+                Preferences
+                <input type="text" name="new_customer_preferences" placeholder="Optional">
+            </label>
+            {% endif %}
+            <div class="full-span multi-item-grid">
+                {% for item in menu_items %}
+                <div class="checkbox-card">
+                    <label>
+                        <input type="checkbox" name="item_id" value="{{ item.item_id }}">
+                        {{ item.item_name }} ({{ "%.2f"|format(item.price) }})
+                    </label>
+                    <input type="number" name="quantity_{{ item.item_id }}" min="1" value="1">
+                </div>
+                {% endfor %}
+            </div>
+            <button class="button full-span" type="submit">Place Order</button>
+        </form>
+    </div>
+    <div class="panel">
+        <div class="panel-head"><h3>Orders List</h3></div>
+        {% for order in orders %}
+        <div class="record-card">
+            <div class="record-summary">
+                <strong>Order #{{ order.order_id }}</strong>
+                <span>{{ order.customer_name or 'Walk-in' }}</span>
+                <span>{{ order.order_time }}</span>
+                <span>Total: {{ "%.2f"|format(order.total_amount) }}</span>
+            </div>
+            <div class="tag-row">
+                {% for detail in order_details[order.order_id] %}
+                <span class="tag">{{ detail.item_name }} x {{ detail.quantity }}</span>
+                {% endfor %}
+            </div>
+            {% if session.get('role') in ['Admin', 'Staff'] %}
+            <form method="post" action="{{ url_for('update_order', order_id=order.order_id) }}" class="inline-form">
+                <select name="status">
+                    {% for status in order_statuses %}
+                    <option value="{{ status }}" {% if status == order.status %}selected{% endif %}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+                <button class="button small" type="submit">Update Status</button>
+            </form>
+            {% else %}
+            <p>Status: {{ order.status }}</p>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>No orders available.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

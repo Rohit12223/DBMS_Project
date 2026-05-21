@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Inventory | RMS{% endblock %}
+{% block page_title %}Inventory{% endblock %}
+{% block content %}
+<section class="content-grid two-column">
+    <div class="panel">
+        <div class="panel-head"><h3>Add Inventory Item</h3></div>
+        <form method="post" class="form-grid">
+            <label>Item Name<input type="text" name="item_name" required></label>
+            <label>Stock Quantity<input type="number" name="stock_quantity" min="0" required></label>
+            <button class="button full-span" type="submit">Add Stock Record</button>
+        </form>
+    </div>
+    <div class="panel">
+        <div class="panel-head"><h3>Current Inventory</h3></div>
+        {% for item in inventory_items %}
+        <div class="record-card">
+            <form method="post" action="{{ url_for('update_inventory', inventory_id=item.inventory_id) }}" class="form-grid">
+                <label>Item Name<input type="text" name="item_name" value="{{ item.item_name }}" required></label>
+                <label>Stock Quantity<input type="number" name="stock_quantity" min="0" value="{{ item.stock_quantity }}" required></label>
+                <label>Last Updated<input type="text" value="{{ item.last_updated }}" disabled></label>
+                <button class="button small" type="submit">Update</button>
+            </form>
+            {% if session.get('role') == 'Admin' %}
+            <form method="post" action="{{ url_for('delete_inventory', inventory_id=item.inventory_id) }}">
+                <button class="button danger small" type="submit">Delete</button>
+            </form>
+            {% endif %}
+        </div>
+        {% else %}
+        <p>No inventory records available.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

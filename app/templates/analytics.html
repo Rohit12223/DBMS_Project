@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Analytics | RMS{% endblock %}
+{% block page_title %}Sales Analytics{% endblock %}
+{% block content %}
+<section class="cards-grid">
+    <article class="stat-card"><span>Daily Sales</span><strong>{{ "%.2f"|format(daily_sales) }}</strong></article>
+    <article class="stat-card"><span>Weekly Sales</span><strong>{{ "%.2f"|format(weekly_sales) }}</strong></article>
+</section>
+<section class="content-grid two-column">
+    <div class="panel">
+        <div class="panel-head"><h3>Top Selling Items</h3></div>
+        <ul class="simple-list">
+            {% for item in top_items %}
+            <li>{{ item.item_name }} <strong>{{ item.total_quantity }}</strong></li>
+            {% else %}
+            <li>No sales yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="panel">
+        <div class="panel-head"><h3>Last 7 Paid Sales Days</h3></div>
+        <ul class="simple-list">
+            {% for row in daily_breakdown %}
+            <li>{{ row.sales_date }} <strong>{{ "%.2f"|format(row.total) }}</strong></li>
+            {% else %}
+            <li>No paid sales recorded.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Employee Management | RMS{% endblock %}
+{% block page_title %}Employee Management{% endblock %}
+{% block content %}
+<section class="content-grid two-column">
+    <div class="panel">
+        <div class="panel-head"><h3>Add Employee</h3></div>
+        <form method="post" class="form-grid">
+            <label>Name<input type="text" name="name" required></label>
+            <label>
+                Role
+                <select name="role" required>
+                    {% for role in employee_roles %}
+                    <option value="{{ role }}">{{ role }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>Shift<input type="text" name="shift" placeholder="Morning / Evening" required></label>
+            <button class="button full-span" type="submit">Add Employee</button>
+        </form>
+    </div>
+    <div class="panel">
+        <div class="panel-head"><h3>Team Directory</h3></div>
+        {% for employee in employees %}
+        <div class="record-card">
+            <form method="post" action="{{ url_for('edit_employee', employee_id=employee.employee_id) }}" class="form-grid">
+                <label>ID<input type="text" value="{{ employee.employee_id }}" disabled></label>
+                <label>Name<input type="text" name="name" value="{{ employee.name }}" required></label>
+                <label>
+                    Role
+                    <select name="role" required>
+                        {% for role in employee_roles %}
+                        <option value="{{ role }}" {% if role == employee.role %}selected{% endif %}>{{ role }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Shift<input type="text" name="shift" value="{{ employee.shift }}" required></label>
+                <button class="button small" type="submit">Update</button>
+            </form>
+            <form method="post" action="{{ url_for('delete_employee', employee_id=employee.employee_id) }}">
+                <button class="button danger small" type="submit">Delete</button>
+            </form>
+        </div>
+        {% else %}
+        <p>No employees found.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

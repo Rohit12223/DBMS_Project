@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Restaurant Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="login-page">
+    <section class="login-shell">
+        <div class="login-hero">
+            <p class="eyebrow">Full-Stack RMS</p>
+            <h1>Restaurant Management System</h1>
+            <p>Use the admin, staff, or customer entry points to manage operations, take orders, or place dining requests.</p>
+        </div>
+        <div class="login-card">
+            <h2>Sign In</h2>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-stack">
+                        {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <form method="post" class="form-grid">
+                <label>
+                    User Type
+                    <select name="user_type" id="user_type" required>
+                        <option value="admin">Admin</option>
+                        <option value="staff">Staff</option>
+                        <option value="customer">Customer</option>
+                    </select>
+                </label>
+                <label data-field="name">
+                    Name
+                    <input type="text" name="name" id="name" placeholder="Enter your name">
+                </label>
+                <label data-field="admin">
+                    Admin Username
+                    <input type="text" name="username" id="username" placeholder="Enter admin username">
+                </label>
+                <label data-field="admin">
+                    Admin Password
+                    <input type="password" name="password" id="password" placeholder="Enter password">
+                </label>
+                <label data-field="staff">
+                    Employee ID
+                    <input type="number" name="employee_id" id="employee_id" placeholder="For staff login">
+                </label>
+                <label data-field="customer">
+                    Phone
+                    <input type="text" name="phone" id="phone" placeholder="For customer login">
+                </label>
+                <label class="full-span" data-field="customer">
+                    Preferences
+                    <textarea name="preferences" id="preferences" rows="3" placeholder="Optional food preferences or notes"></textarea>
+                </label>
+                <button class="button full-span" type="submit">Enter RMS</button>
+            </form>
+        </div>
+    </section>
+    <script>
+        const userType = document.getElementById("user_type");
+        const fieldGroups = document.querySelectorAll("[data-field]");
+        const inputs = {
+            name: document.getElementById("name"),
+            username: document.getElementById("username"),
+            password: document.getElementById("password"),
+            employee_id: document.getElementById("employee_id"),
+            phone: document.getElementById("phone"),
+            preferences: document.getElementById("preferences")
+        };
+
+        function setLoginFields() {
+            const type = userType.value;
+            fieldGroups.forEach((group) => {
+                const field = group.dataset.field;
+                const show =
+                    (type === "admin" && field === "admin") ||
+                    (type === "staff" && ["name", "staff"].includes(field)) ||
+                    (type === "customer" && ["name", "customer"].includes(field));
+                group.classList.toggle("hidden-field", !show);
+            });
+
+            Object.values(inputs).forEach((input) => input.required = false);
+
+            if (type === "admin") {
+                inputs.username.required = true;
+                inputs.password.required = true;
+            } else if (type === "staff") {
+                inputs.name.required = true;
+                inputs.employee_id.required = true;
+            } else {
+                inputs.name.required = true;
+                inputs.phone.required = true;
+            }
+        }
+
+        userType.addEventListener("change", setLoginFields);
+        setLoginFields();
+    </script>
+</body>
+</html>

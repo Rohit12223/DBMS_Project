@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Reservations | RMS{% endblock %}
+{% block page_title %}Reservations{% endblock %}
+{% block content %}
+<section class="content-grid two-column">
+    <div class="panel">
+        <div class="panel-head"><h3>Book a Table</h3></div>
+        <form method="post" class="form-grid">
+            {% if session.get('role') != 'Customer' %}
+            <label>
+                Customer
+                <select name="customer_id" required>
+                    <option value="">Select customer</option>
+                    {% for customer in customers %}
+                    <option value="{{ customer.customer_id }}">{{ customer.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            {% endif %}
+            <label>Date<input type="date" name="date" required></label>
+            <label>Time<input type="time" name="time" required></label>
+            <label>Table Number<input type="number" name="table_number" min="1" required></label>
+            <button class="button full-span" type="submit">Save Reservation</button>
+        </form>
+    </div>
+    <div class="panel">
+        <div class="panel-head"><h3>Upcoming Reservations</h3></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Table</th>
+                    {% if session.get('role') in ['Admin', 'Staff'] %}<th>Action</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                <tr>
+                    <td>{{ reservation.customer_name }}</td>
+                    <td>{{ reservation['date'] }}</td>
+                    <td>{{ reservation['time'] }}</td>
+                    <td>{{ reservation.table_number }}</td>
+                    {% if session.get('role') in ['Admin', 'Staff'] %}
+                    <td>
+                        <form method="post" action="{{ url_for('delete_reservation', reservation_id=reservation.reservation_id) }}">
+                            <button class="button danger small" type="submit">Cancel</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr><td colspan="5">No reservations found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Customer Management | RMS{% endblock %}
+{% block page_title %}Customer Management{% endblock %}
+{% block content %}
+<section class="content-grid two-column">
+    <div class="panel">
+        <div class="panel-head"><h3>Add Customer</h3></div>
+        <form method="post" class="form-grid">
+            <label>Name<input type="text" name="name" required></label>
+            <label>Phone<input type="text" name="phone" required></label>
+            <label class="full-span">Preferences<textarea name="preferences" rows="3"></textarea></label>
+            <button class="button full-span" type="submit">Add Customer</button>
+        </form>
+    </div>
+    <div class="panel">
+        <div class="panel-head"><h3>Customer Directory</h3></div>
+        {% for customer in customers %}
+        <div class="record-card">
+            <form method="post" action="{{ url_for('edit_customer', customer_id=customer.customer_id) }}" class="form-grid">
+                <label>Name<input type="text" name="name" value="{{ customer.name }}" required></label>
+                <label>Phone<input type="text" name="phone" value="{{ customer.phone }}" required></label>
+                <label class="full-span">Preferences<textarea name="preferences" rows="2">{{ customer.preferences }}</textarea></label>
+                <button class="button small" type="submit">Update</button>
+            </form>
+            {% if session.get('role') == 'Admin' %}
+            <form method="post" action="{{ url_for('delete_customer', customer_id=customer.customer_id) }}">
+                <button class="button danger small" type="submit">Delete</button>
+            </form>
+            {% endif %}
+            <div class="history-block">
+                <h4>Order History</h4>
+                <ul>
+                    {% for order in customer_histories[customer.customer_id] %}
+                    <li>Order #{{ order.order_id }} | {{ order.status }} | {{ "%.2f"|format(order.total_amount) }}</li>
+                    {% else %}
+                    <li>No orders yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% else %}
+        <p>No customers found.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

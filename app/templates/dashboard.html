@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | RMS{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<section class="cards-grid">
+    <article class="stat-card"><span>Customers</span><strong>{{ summary.customers }}</strong></article>
+    <article class="stat-card"><span>Employees</span><strong>{{ summary.employees }}</strong></article>
+    <article class="stat-card"><span>Menu Items</span><strong>{{ summary.menu_items }}</strong></article>
+    <article class="stat-card"><span>Orders</span><strong>{{ summary.orders }}</strong></article>
+    <article class="stat-card"><span>Reservations</span><strong>{{ summary.reservations }}</strong></article>
+    <article class="stat-card"><span>Low Stock Items</span><strong>{{ summary.inventory_low }}</strong></article>
+</section>
+
+<section class="content-grid">
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Recent Orders</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>#{{ order.order_id }}</td>
+                    <td>{{ order.customer_name or 'Walk-in' }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ "%.2f"|format(order.total_amount) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4">No recent orders yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Order Status Overview</h3>
+        </div>
+        <div class="status-list">
+            {% for row in status_counts %}
+            <div class="status-item">
+                <span>{{ row.status }}</span>
+                <strong>{{ row.total }}</strong>
+            </div>
+            {% else %}
+            <p>No order data available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if session.get('role') == 'Customer' %}
+<section class="panel">
+    <div class="panel-head">
+        <h3>Your Order History</h3>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in customer_history %}
+            <tr>
+                <td>#{{ order.order_id }}</td>
+                <td>{{ order.order_time }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.payment_status }}</td>
+                <td>{{ "%.2f"|format(order.total_amount) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">You have not placed any orders yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endif %}
+{% endblock %}
